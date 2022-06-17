@@ -4,57 +4,72 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
-// Function BubbleSort(slice) - Sort a slice of integers in ascending order
-func BubbleSort(slice []int) {
-	// Check that the slice contains at least two elements
-	if len(slice) > 1 {
-		for imax := len(slice) - 1; imax > 0; imax -= 1 {
-			for i := 0; i < imax; i += 1 {
-				if slice[i] > slice[i+1] {
-					Swap(slice, i)
-				}
-			}
-		}
-	}
+type Animal struct {
+	food       string
+	locomotion string
+	sound      string
 }
 
-// Swap i'th and (i+1)'th element of the slice using a temporary variable
-func Swap(slice []int, idx int) {
-	itmp := slice[idx]
-	slice[idx] = slice[idx+1]
-	slice[idx+1] = itmp
+func initData(nameMap map[string]Animal) {
+	nameMap["cow"] = Animal{"grass", "walk", "moo"}
+	nameMap["bird"] = Animal{"worms", "fly", "peep"}
+	nameMap["snake"] = Animal{"mice", "slither", "hss"}
+}
+
+func (animal Animal) Eat() {
+	fmt.Println(animal.food)
+}
+
+func (animal Animal) Move() {
+	fmt.Println(animal.locomotion)
+}
+
+func (animal Animal) Speak() {
+	fmt.Println(animal.sound)
+}
+
+func executeQuery(nameMap map[string]Animal) {
+	fmt.Println("Input request or type exit to quit the program: ")
+	for {
+		fmt.Printf(">")
+		consoleReader := bufio.NewReader(os.Stdin)
+		inputStr, _ := consoleReader.ReadString('\n')
+		inputStr = strings.Trim(inputStr, "\n")
+		inputList := strings.Split(inputStr, " ")
+		lenInpList := len(inputList)
+		switch lenInpList {
+		case 0:
+			fmt.Println("Please provide input request")
+		case 1:
+			if inputList[0] == "exit" {
+				return
+			} else {
+				fmt.Println("Please provide correct input")
+			}
+		case 2:
+			if (inputList[0] == "cow" || inputList[0] == "bird" || inputList[0] == "snake") && (inputList[1] == "eat" || inputList[1] == "move" || inputList[1] == "speak") {
+				if inputList[1] == "eat" {
+					nameMap[inputList[0]].Eat()
+				} else if inputList[1] == "move" {
+					nameMap[inputList[0]].Move()
+				} else if inputList[1] == "speak" {
+					nameMap[inputList[0]].Speak()
+				}
+			} else {
+				fmt.Println("Please provide correct input")
+			}
+		default:
+			fmt.Println("Please provide correct input")
+		}
+	}
 }
 
 func main() {
-	// Create an empty slice
-	sli := make([]int, 0)
-
-	// Ask user for the list of numbers
-	fmt.Print("Type a sequence of integers separated by spaces: ")
-	sread, err := bufio.NewReader(os.Stdin).ReadString('\n') // Read a string from stdin
-	if err == nil {
-		slist := strings.Split(strings.Trim(sread, " \r\n"), " ") // Split trimmed string into slice of numbers (as strings)
-		for _, sval := range slist {                              // For every number (as string) in the slice ...
-			ival, err := strconv.Atoi(sval) // Convert to integer
-			if err == nil {
-				sli = append(sli, ival) // Append to slice of integers if conversion was successful
-			}
-		}
-	} else {
-		return
-	}
-
-	// Sort slice
-	BubbleSort(sli)
-
-	// Print sorted slice
-	fmt.Print("Sorted list of values: ")
-	for _, ival := range sli {
-		fmt.Printf("%d ", ival)
-	}
-	fmt.Println()
+	nameMap := make(map[string]Animal)
+	initData(nameMap)
+	// fmt.Println(nameMap)
+	executeQuery(nameMap)
 }
