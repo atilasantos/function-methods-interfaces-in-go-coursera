@@ -1,75 +1,60 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 )
 
-type Animal struct {
+type animal struct {
 	food       string
 	locomotion string
-	sound      string
+	noise      string
 }
 
-func initData(nameMap map[string]Animal) {
-	nameMap["cow"] = Animal{"grass", "walk", "moo"}
-	nameMap["bird"] = Animal{"worms", "fly", "peep"}
-	nameMap["snake"] = Animal{"mice", "slither", "hss"}
+type animalInterface interface {
+	Eat()
+	Move()
+	Speak()
 }
 
-func (animal Animal) Eat() {
-	fmt.Println(animal.food)
+func (ani animal) Eat() {
+	fmt.Println(ani.food)
+	return
 }
 
-func (animal Animal) Move() {
-	fmt.Println(animal.locomotion)
+func (ani animal) Move() {
+	fmt.Println(ani.locomotion)
+	return
 }
 
-func (animal Animal) Speak() {
-	fmt.Println(animal.sound)
-}
-
-func executeQuery(nameMap map[string]Animal) {
-	fmt.Println("Input request or type exit to quit the program: ")
-	for {
-		fmt.Printf(">")
-		consoleReader := bufio.NewReader(os.Stdin)
-		inputStr, _ := consoleReader.ReadString('\n')
-		inputStr = strings.Trim(inputStr, "\n")
-		inputList := strings.Split(inputStr, " ")
-		lenInpList := len(inputList)
-		switch lenInpList {
-		case 0:
-			fmt.Println("Please provide input request")
-		case 1:
-			if inputList[0] == "exit" {
-				return
-			} else {
-				fmt.Println("Please provide correct input")
-			}
-		case 2:
-			if (inputList[0] == "cow" || inputList[0] == "bird" || inputList[0] == "snake") && (inputList[1] == "eat" || inputList[1] == "move" || inputList[1] == "speak") {
-				if inputList[1] == "eat" {
-					nameMap[inputList[0]].Eat()
-				} else if inputList[1] == "move" {
-					nameMap[inputList[0]].Move()
-				} else if inputList[1] == "speak" {
-					nameMap[inputList[0]].Speak()
-				}
-			} else {
-				fmt.Println("Please provide correct input")
-			}
-		default:
-			fmt.Println("Please provide correct input")
-		}
-	}
+func (ani animal) Speak() {
+	fmt.Println(ani.noise)
+	return
 }
 
 func main() {
-	nameMap := make(map[string]Animal)
-	initData(nameMap)
-	// fmt.Println(nameMap)
-	executeQuery(nameMap)
+	animalMap := make(map[string]animal)
+	animalMap["cow"] = animal{"grass", "walk", "moo"}
+	animalMap["bird"] = animal{"worms", "fly", "peep"}
+	animalMap["snake"] = animal{"mice", "slither", "hsss"}
+	var genralAni animalInterface
+	for {
+		var command, requestAni, requestType string
+		fmt.Print(">")
+		fmt.Scan(&command, &requestAni, &requestType)
+		if command == "query" {
+			genralAni = animalMap[requestAni]
+			switch requestType {
+			case "eat":
+				genralAni.Eat()
+			case "move":
+				genralAni.Move()
+			case "speak":
+				genralAni.Speak()
+			}
+		}
+		if command == "newanimal" {
+			animalMap[requestAni] = animalMap[requestType]
+			fmt.Println("Created it!")
+		}
+	}
 }
